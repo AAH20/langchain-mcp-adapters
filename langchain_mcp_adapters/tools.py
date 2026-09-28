@@ -508,9 +508,8 @@ def convert_mcp_tool_to_langchain_tool(
         return _convert_call_tool_result(call_tool_result)
 
     meta = getattr(tool, "meta", None)
-    base = tool.annotations.model_dump() if tool.annotations is not None else {}
     meta = {"_meta": meta} if meta is not None else {}
-    metadata = {**base, **meta} or None
+    metadata = meta or None
 
     # Apply server name prefix if requested
     lc_tool_name = tool.name
@@ -531,6 +530,7 @@ def convert_mcp_tool_to_langchain_tool(
         args_schema=tool.inputSchema,
         coroutine=call_tool,
         response_format="content_and_artifact",
+        annotations=tool.annotations,
         metadata=metadata,
         handle_tool_error=error_handler,  # type: ignore[arg-type]
     )
@@ -683,3 +683,4 @@ def to_fastmcp(tool: BaseTool) -> FastMCPTool:
         fn_metadata=fn_metadata,
         is_async=True,
     )
+
